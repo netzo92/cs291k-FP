@@ -20,9 +20,10 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-
+import random
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
+
 
 # Process images of this size. Note that this differs from the original CIFAR
 # image size of 32 x 32. If one alters this number, then the entire model
@@ -35,6 +36,24 @@ NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50000
 NUM_EXAMPLES_PER_EPOCH_FOR_VAL = 10000
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
 
+
+def split_train_file(location):
+    num_train = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*0.9
+    num_val = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*0.1
+    k = [0]*num_train+[1]*num_val
+    random.shuffle(k)
+    with open(os.path.join(location,'cifar-100-binary', 'train.bin'), 'r') as f:
+        train_split_file = open(os.path.join(location,'cifar-100-binary', 'train-split.bin'),'w')
+        test_split_file = open(os.path.join(location,'cifar-100-binary', 'val-split.bin'),'w')
+        for val in k:
+            data = f.read(2+32*32*3)
+            if val is 0:
+                train_split_file.write(data)
+            elif val is 1:
+                test_split_file.write(data)
+        train_split_file.close()
+        test_split_file.close()
+    
 
 def read_cifar100(filename_queue):
   """Reads and parses examples from CIFAR10 data files.
@@ -144,7 +163,7 @@ def distorted_inputs(data_dir, batch_size):
     images: Images. 4D tensor of [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3] size.
     labels: Labels. 1D tensor of [batch_size] size.
   """
-  filenames = [os.path.join(os.getcwd(), data_dir,'cifar-100-binary', 'train.bin')]
+  filenames = [os.path.join(os.getcwd(), data_dir,'cifar-100-binary', 'train-split.bin')]
   
   for f in filenames:
     if not tf.gfile.Exists(f):
@@ -205,13 +224,13 @@ def inputs(eval_data, data_dir, batch_size):
   """
   
   if eval_data is "train":
-    filenames = [os.path.join(data_dir,'cifar-100-binary', 'train.bin')]
+    filenames = [os.path.join(data_dir,'cifar-100-binary', 'train-split.bin')]
     num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
   elif eval_data is "test":
     filenames = [os.path.join(data_dir,'cifar-100-binary', 'test.bin')]
     num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
   elif eval_data is 'val':
-    filenames = [os.path.join(data_dir, 'cifar-100-binary','train.bin')]
+    filenames = [os.path.join(data_dir, 'cifar-100-binary','val-split.bin')]
 
   for f in filenames:
     if not tf.gfile.Exists(f):

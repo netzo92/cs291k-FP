@@ -127,6 +127,8 @@ def main(argv=None):  # pylint: disable=unused-argument
   if tf.gfile.Exists(FLAGS.train_dir):
     tf.gfile.DeleteRecursively(FLAGS.train_dir)
   tf.gfile.MakeDirs(FLAGS.train_dir)
+  if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'val-split.bin')):
+      data_utils.test_train_split(FLAGS.data_dir)
   train()
 
 

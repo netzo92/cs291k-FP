@@ -32,6 +32,7 @@ IMAGE_SIZE = 24
 # Global constants describing the CIFAR-10 data set.
 NUM_CLASSES = 20
 NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50000
+NUM_EXAMPLES_PER_EPOCH_FOR_VAL = 10000
 NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
 
 
@@ -154,7 +155,7 @@ def distorted_inputs(data_dir, batch_size):
   filename_queue = tf.train.string_input_producer(filenames)
 
   # Read examples from files in the filename queue.
-  read_input = read_cifar10(filename_queue)
+  read_input = read_cifar100(filename_queue)
   reshaped_image = tf.cast(read_input.uint8image, tf.float32)
 
   height = IMAGE_SIZE
@@ -205,12 +206,14 @@ def inputs(eval_data, data_dir, batch_size):
     labels: Labels. 1D tensor of [batch_size] size.
   """
   
-  if not eval_data:
+  if eval_data is "train":
     filenames = [os.path.join(data_dir,'cifar-100-binary', 'train.bin')]
     num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
-  else:
+  elif eval_data is "test":
     filenames = [os.path.join(data_dir,'cifar-100-binary', 'test.bin')]
     num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
+  elif eval_data is 'val':
+    filenames = [os.path.join(data_dir, 'cifar-100-binary','train.bin')]
 
   for f in filenames:
     if not tf.gfile.Exists(f):

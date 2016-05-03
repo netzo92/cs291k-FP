@@ -223,7 +223,7 @@ def inputs(eval_data, data_dir, batch_size):
   filename_queue = tf.train.string_input_producer(filenames)
 
   # Read examples from files in the filename queue.
-  read_input = read_cifar10(filename_queue)
+  read_input = read_cifar100(filename_queue)
   reshaped_image = tf.cast(read_input.uint8image, tf.float32)
 
   height = IMAGE_SIZE

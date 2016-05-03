@@ -41,7 +41,7 @@ import os
 import numpy as np
 import tensorflow as tf
 import conv_net2 as conv_net
-
+import data_utils
 FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string('eval_dir', os.path.join(os.getcwd(),'cifar100_eval'),
@@ -148,9 +148,11 @@ def main(argv=None):  # pylint: disable=unused-argument
   if tf.gfile.Exists(FLAGS.eval_dir):
     tf.gfile.DeleteRecursively(FLAGS.eval_dir)
   tf.gfile.MakeDirs(FLAGS.eval_dir)
+  if not tf.gfile.Exists(os.path.join(os.getcwd(),FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(os.getcwd(), FLAGS.data_dir,'val-split.bin')):
+	data_utils.split_train_file(os.path.join(os.getcwd(),FLAGS.data_dir))
   evaluate('train')  #
-  evaluate('test') #
-
+  evaluate('val')
+  evaluate('test')
 
 if __name__ == '__main__':
   tf.app.run()

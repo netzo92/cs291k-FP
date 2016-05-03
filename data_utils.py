@@ -40,7 +40,7 @@ NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
 def split_train_file(location):
     num_train = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*0.9
     num_val = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*0.1
-    k = [0]*num_train+[1]*num_val
+    k = [0]*int(num_train)+[1]*int(num_val)
     random.shuffle(k)
     with open(os.path.join(location,'cifar-100-binary', 'train.bin'), 'r') as f:
         train_split_file = open(os.path.join(location,'cifar-100-binary', 'train-split.bin'),'w')
@@ -206,7 +206,7 @@ def distorted_inputs(data_dir, batch_size):
          'This will take a few minutes.' % min_queue_examples)
 
   images, labels = _generate_image_and_label_batch(float_image, read_input.label, min_queue_examples, batch_size, shuffle = True)
-  print(str(images.get_shape()))
+  #print(str(images.get_shape()))
   # Generate a batch of images and labels by building up a queue of examples.
   return _images, labels
 
@@ -225,13 +225,13 @@ def inputs(eval_data, data_dir, batch_size):
   
   if eval_data is "train":
     filenames = [os.path.join(data_dir,'cifar-100-binary', 'train-split.bin')]
-    num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN
+    num_examples_per_epoch = int(NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*0.9)
   elif eval_data is "test":
     filenames = [os.path.join(data_dir,'cifar-100-binary', 'test.bin')]
     num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
   elif eval_data is 'val':
     filenames = [os.path.join(data_dir, 'cifar-100-binary','val-split.bin')]
-
+    num_examples_per_epoch = int(NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*(0.1))
   for f in filenames:
     if not tf.gfile.Exists(f):
       raise ValueError('Failed to find file: ' + f)
@@ -256,10 +256,7 @@ def inputs(eval_data, data_dir, batch_size):
 
   # Ensure that the random shuffling has good mixing properties.
   min_fraction_of_examples_in_queue = 0.4
-  min_queue_examples = int(num_examples_per_epoch *
-                           min_fraction_of_examples_in_queue)
-  print('tensor '+str(float_image.get_shape()))
+  min_queue_examples = int(num_examples_per_epoch * min_fraction_of_examples_in_queue)
   # Generate a batch of images and labels by building up a queue of examples.
   images, labels = _generate_image_and_label_batch(float_image, read_input.label, min_queue_examples, batch_size, shuffle = False)
-  print(str(float_image.get_shape()))
   return images, labels

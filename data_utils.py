@@ -82,7 +82,6 @@ def read_cifar100(filename_queue):
   result.key, value = reader.read(filename_queue)
 
   record_bytes = tf.decode_raw(value, tf.uint8)
-  print(type(record_bytes))
   result.label = tf.cast(
       tf.slice(record_bytes, [0], [1]), tf.int32)
 
@@ -187,11 +186,10 @@ def distorted_inputs(data_dir, batch_size):
   print ('Filling queue with %d CIFAR images before starting to train. '
          'This will take a few minutes.' % min_queue_examples)
 
+  images, labels = _generate_image_and_label_batch(float_image, read_input.label, min_queue_examples, batch_size, shuffle = True)
+  print(str(images.get_shape()))
   # Generate a batch of images and labels by building up a queue of examples.
-  return _generate_image_and_label_batch(float_image, read_input.label,
-                                         min_queue_examples, batch_size,
-                                         shuffle=True)
-
+  return _images, labels
 
 def inputs(eval_data, data_dir, batch_size):
   """Construct input for CIFAR evaluation using the Reader ops.

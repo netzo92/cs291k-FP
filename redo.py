@@ -98,7 +98,13 @@ def eval_once(eval_data, saver, summary_writer, top_k_op, summary_op):
 
       # Compute precision @ 1.
       precision = true_count / total_sample_count
-      print('%s: precision @ 1 = %.3f' % (datetime.now(), precision))
+      if eval_data is 'test':
+        print('Testing Accuracy:  %.3f' % (precision))
+      elif eval_data is 'train':
+        print('Training Accuracy:  %.3f'%(precision))
+      elif eval_data is 'val':
+        print('Validation Accuracy:  %.3f'%(precision))
+
 
       summary = tf.Summary()
       summary.ParseFromString(sess.run(summary_op))
@@ -136,19 +142,15 @@ def evaluate(eval_data):
 
     summary_writer = tf.train.SummaryWriter(FLAGS.eval_dir, g)
 
-    while True:
-      eval_once(saver, summary_writer, top_k_op, summary_op)
-      if FLAGS.run_once:
-        break
-      time.sleep(FLAGS.eval_interval_secs)
-
+    eval_once(eval_data, saver, summary_writer, top_k_op, summary_op)
 
 def main(argv=None):  # pylint: disable=unused-argument
   conv_net.maybe_download_and_extract()
   if tf.gfile.Exists(FLAGS.eval_dir):
     tf.gfile.DeleteRecursively(FLAGS.eval_dir)
   tf.gfile.MakeDirs(FLAGS.eval_dir)
-  evaluate()
+  evaluate('train')  #
+  evaluate('test') #
 
 
 if __name__ == '__main__':

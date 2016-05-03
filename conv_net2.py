@@ -51,7 +51,7 @@ FLAGS = tf.app.flags.FLAGS
 # Basic model parameters.
 tf.app.flags.DEFINE_integer('batch_size', 128,
                             """Number of images to process in a batch.""")
-tf.app.flags.DEFINE_string('data_dir', '/cifar100_data',
+tf.app.flags.DEFINE_string('data_dir', os.path.join(os.getcwd(),'cifar100_data'),
                            """Path to the CIFAR-10 data directory.""")
 
 # Global constants describing the CIFAR-10 data set.
@@ -72,7 +72,7 @@ INITIAL_LEARNING_RATE = 0.1       # Initial learning rate.
 # names of the summaries when visualizing a model.
 TOWER_NAME = 'tower'
 
-DATA_URL = 'http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz'
+DATA_URL = 'http://www.cs.toronto.edu/~kriz/cifar-100-binary.tar.gz'
 
 
 def _activation_summary(x):
@@ -145,7 +145,7 @@ def distorted_inputs():
   """
   if not FLAGS.data_dir:
     raise ValueError('Please supply a data_dir')
-  data_dir = os.path.join(FLAGS.data_dir, 'cifar-10-batches-bin')
+  data_dir = FLAGS.data_dir
   return data_utils.distorted_inputs(data_dir=data_dir,
                                         batch_size=FLAGS.batch_size)
 

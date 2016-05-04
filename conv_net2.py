@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-"""Builds the CIFAR-10 network.
+"""Builds the CIFAR-100 network.
 
 Summary of available functions:
 
@@ -155,8 +155,7 @@ def distorted_inputs():
   if not FLAGS.data_dir:
     raise ValueError('Please supply a data_dir')
   data_dir = FLAGS.data_dir
-  return data_utils.distorted_inputs(data_dir=data_dir,
-                                        batch_size=FLAGS.batch_size)
+  return data_utils.distorted_inputs(data_dir=data_dir, cbatch_size=FLAGS.batch_size)
 
 
 def inputs(eval_data):
@@ -383,24 +382,25 @@ def maybe_download_and_extract():
     print('Successfully downloaded', filename, statinfo.st_size, 'bytes.')
     tarfile.open(filepath, 'r:gz').extractall(dest_directory)
     data_utils.train_test_split(dest_directory)
+
 def train():
   """Train CIFAR-10 for a number of steps."""
   with tf.Graph().as_default():
     global_step = tf.Variable(0, trainable=False)
 
     # Get images and labels for CIFAR-10.
-    images, labels = conv_net.distorted_inputs()
+    images, labels = distorted_inputs()
 
     # Build a Graph that computes the logits predictions from the
     # inference model.
-    logits = conv_net.inference(images)
+    logits = inference(images)
 
     # Calculate loss.
-    loss = conv_net.loss(logits, labels)
+    loss = loss(logits, labels)
 
     # Build a Graph that trains the model with one batch of examples and
     # updates the model parameters.
-    train_op = conv_net.train(loss, global_step)
+    train_op = train(loss, global_step)
 
     # Create a saver.
     saver = tf.train.Saver(tf.all_variables())
@@ -448,7 +448,7 @@ def train():
         saver.save(sess, checkpoint_path, global_step=step)
 
 def main(argv=None):  # pylint: disable=unused-argument
-  conv_net.maybe_download_and_extract()
+  maybe_download_and_extract()
   if tf.gfile.Exists(FLAGS.train_dir):
     tf.gfile.DeleteRecursively(FLAGS.train_dir)
   tf.gfile.MakeDirs(FLAGS.train_dir)

@@ -208,7 +208,7 @@ def distorted_inputs(data_dir, batch_size):
   images, labels = _generate_image_and_label_batch(float_image, read_input.label, min_queue_examples, batch_size, shuffle = True)
   #print(str(images.get_shape()))
   # Generate a batch of images and labels by building up a queue of examples.
-  return _images, labels
+  return images, labels
 
 def inputs(eval_data, data_dir, batch_size):
   """Construct input for CIFAR evaluation using the Reader ops.

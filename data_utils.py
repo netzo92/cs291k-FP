@@ -13,7 +13,7 @@
 # limitations under the License.
 # ==============================================================================
 
-"""Routine for decoding the CIFAR-10 binary file format."""
+"""Routine for decoding the CIFAR-100 binary file format."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -77,9 +77,9 @@ def read_cifar100(filename_queue):
       uint8image: a [height, width, depth] uint8 Tensor with the image data
   """
 
-  class CIFAR10Record(object):
+  class CIFAR100Record(object):
     pass
-  result = CIFAR10Record()
+  result = CIFAR100Record()
 
   # Dimensions of the images in the CIFAR-10 dataset.
   # See http://www.cs.toronto.edu/~kriz/cifar.html for a description of the
@@ -248,8 +248,7 @@ def inputs(eval_data, data_dir, batch_size):
 
   # Image processing for evaluation.
   # Crop the central [height, width] of the image.
-  resized_image = tf.image.resize_image_with_crop_or_pad(reshaped_image,
-                                                         width, height)
+  resized_image = tf.image.resize_image_with_crop_or_pad(reshaped_image, width, height)
 
   # Subtract off the mean and divide by the variance of the pixels.
   float_image = tf.image.per_image_whitening(resized_image)

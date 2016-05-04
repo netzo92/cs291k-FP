@@ -103,7 +103,7 @@ def choose_model():
       return None, None
 
 def main(argv=sys.argv):
-  if len(sys.argv > 1):
+  if len(sys.argv) > 1:
     FLAGS.data_dir = sys.argv[1]
   conv_net.maybe_download_and_extract()
   if tf.gfile.Exists(FLAGS.eval_dir):

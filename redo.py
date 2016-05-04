@@ -110,12 +110,12 @@ def main(argv=sys.argv):
     tf.gfile.DeleteRecursively(FLAGS.eval_dir)
   tf.gfile.MakeDirs(FLAGS.eval_dir)
   if not tf.gfile.Exists(os.path.join(os.getcwd(),FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(os.getcwd(), FLAGS.data_dir,'val-split.bin')):
-	data_utils.split_train_file(os.path.join(os.getcwd(),FLAGS.data_dir))
+    data_utils.split_train_file(os.path.join(os.getcwd(),FLAGS.data_dir))
   model_path, global_step = choose_model()
   if model_path is not None:
-	  evaluate('train', model_path, global_step)  #
-	  evaluate('val', model_path, global_step)
-	  evaluate('test', model_path, global_step)
+    evaluate('train', model_path, global_step)  #
+    evaluate('val', model_path, global_step)
+    evaluate('test', model_path, global_step)
 
 if __name__ == '__main__':
   tf.app.run()

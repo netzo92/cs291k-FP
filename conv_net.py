@@ -343,8 +343,11 @@ def maybe_download_and_extract():
     os.makedirs(dest_directory)
   filename = DATA_URL.split('/')[-1]
   filepath = os.path.join(dest_directory, filename)
-  print(filepath)
-  if not os.path.exists(filepath):
+  non_compressed_filepath = filepath.rsplit('.', 2)[0]
+  if not os.path.exists(non_compressed_filepath) and os.path.exists(filepath):
+    print('Compressed file found, decompressing')
+    tarfile.open(filepath, 'r:gz').extractall(dest_directory)
+  elif not os.path.exists(filepath):
     def _progress(count, block_size, total_size):
       sys.stdout.write('\r>> Downloading %s %.1f%%' % (filename,
           float(count * block_size) / float(total_size) * 100.0))
@@ -354,7 +357,9 @@ def maybe_download_and_extract():
     statinfo = os.stat(filepath)
     print('Successfully downloaded', filename, statinfo.st_size, 'bytes.')
     tarfile.open(filepath, 'r:gz').extractall(dest_directory)
-    data_utils.split_train_file(dest_directory)
+  if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'val-split.bin')):
+    print('Train/Validation sets not split, splitting')
+    data_utils.split_train_file(FLAGS.data_dir)
 
 def main(argv=None):  # pylint: disable=unused-argument
  maybe_download_and_extract()
@@ -363,8 +368,6 @@ def main(argv=None):  # pylint: disable=unused-argument
   FLAGS.train_dir = os.path.join(os.getcwd(),'cifar100_train'+str(dir_num))
   dir_num += 1
  tf.gfile.MakeDirs(FLAGS.train_dir)
- if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'val-split.bin')):
-  data_utils.split_train_file(FLAGS.data_dir)
  train_model()
 
 if __name__ == '__main__':

@@ -60,8 +60,7 @@ tf.app.flags.DEFINE_string('train_dir', os.path.join(os.getcwd(),'cifar100_train
                            """and checkpoint.""")
 tf.app.flags.DEFINE_integer('max_steps', 20000,
                             """Number of batches to run.""")
-tf.app.flags.DEFINE_boolean('log_device_placement', False,
-                            """Whether to log device placement."""
+
                             
 # Global constants describing the CIFAR-10 data set.
 IMAGE_SIZE = data_utils.IMAGE_SIZE
@@ -413,7 +412,7 @@ def train():
 
     # Start running operations on the Graph.
     sess = tf.Session(config=tf.ConfigProto(
-        log_device_placement=FLAGS.log_device_placement))
+        log_device_placement=False))
     sess.run(init)
 
     # Start the queue runners.

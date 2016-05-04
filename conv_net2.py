@@ -448,13 +448,15 @@ def train():
         saver.save(sess, checkpoint_path, global_step=step)
 
 def main(argv=None):  # pylint: disable=unused-argument
-  maybe_download_and_extract()
-  if tf.gfile.Exists(FLAGS.train_dir):
-    tf.gfile.DeleteRecursively(FLAGS.train_dir)
-  tf.gfile.MakeDirs(FLAGS.train_dir)
-  if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'val-split.bin')):
-      data_utils.test_train_split(FLAGS.data_dir)
-  train()
+ maybe_download_and_extract()
+ dir_count = 1
+ while tf.gfile.Exists(FLAGS.train_dir):
+  FLAGS.train_dir = os.path.join(os.getcwd(),'cifar100_train'+str(dir_count))
+  dir_count += 1
+ tf.gfile.MakeDirs(FLAGS.train_dir)
+ if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'val-split.bin')):
+  data_utils.test_train_split(FLAGS.data_dir)
+ train()
 
 if __name__ == '__main__':
  tf.app.run()

@@ -449,10 +449,10 @@ def train():
 
 def main(argv=None):  # pylint: disable=unused-argument
  maybe_download_and_extract()
- dir_count = 1
+ dir_num = 1
  while tf.gfile.Exists(FLAGS.train_dir):
-  FLAGS.train_dir = os.path.join(os.getcwd(),'cifar100_train'+str(dir_count))
-  dir_count += 1
+  FLAGS.train_dir = os.path.join(os.getcwd(),'cifar100_train'+str(dir_num))
+  dir_num += 1
  tf.gfile.MakeDirs(FLAGS.train_dir)
  if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'val-split.bin')):
   data_utils.test_train_split(FLAGS.data_dir)

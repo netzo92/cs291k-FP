@@ -154,7 +154,7 @@ def distorted_inputs():
   if not FLAGS.data_dir:
     raise ValueError('Please supply a data_dir')
   data_dir = FLAGS.data_dir
-  return data_utils.distorted_inputs(data_dir=data_dir, cbatch_size=FLAGS.batch_size)
+  return data_utils.distorted_inputs(data_dir=data_dir, batch_size=FLAGS.batch_size)
 
 
 def inputs(eval_data):

@@ -48,12 +48,8 @@ tf.app.flags.DEFINE_string('eval_dir', os.path.join(os.getcwd(),'cifar100_eval')
                            """Directory where to write event logs.""")
 tf.app.flags.DEFINE_string('checkpoint_dir', os.path.join(os.getcwd(),'cifar100_train'),
                            """Directory where to read model checkpoints.""")
-tf.app.flags.DEFINE_integer('eval_interval_secs', 60 * 5,
-                            """How often to run the eval.""")
 tf.app.flags.DEFINE_integer('num_examples', 10000,
                             """Number of examples to run.""")
-tf.app.flags.DEFINE_boolean('run_once', True,
-                         """Whether to run eval only once.""")
 
 
 def eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_op, summary_op):
@@ -66,7 +62,7 @@ def eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_o
     summary_op: Summary op.
   """
   with tf.Session() as sess:
-  	saver.restore(sess, ckpt.model_checkpoint_path)
+  	saver.restore(sess, model_path)
     coord = tf.train.Coordinator()
     try:
       threads = []

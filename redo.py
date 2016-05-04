@@ -56,7 +56,7 @@ tf.app.flags.DEFINE_boolean('run_once', True,
                          """Whether to run eval only once.""")
 
 
-def eval_once(eval_data, saver, summary_writer, top_k_op, summary_op):
+def eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_op, summary_op):
   """Run Eval once.
 
   Args:
@@ -66,20 +66,7 @@ def eval_once(eval_data, saver, summary_writer, top_k_op, summary_op):
     summary_op: Summary op.
   """
   with tf.Session() as sess:
-    ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
-    if ckpt and ckpt.model_checkpoint_path:
-      # Restores from checkpoint
-      saver.restore(sess, ckpt.model_checkpoint_path)
-      # Assuming model_checkpoint_path looks something like:
-      #   /my-favorite-path/cifar10_train/model.ckpt-0,
-      # extract global_step from it.
-      print(ckpt.model_checkpoint_path)
-      global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
-    else:
-      print('No checkpoint file found')
-      return
-
-    # Start the queue runners.
+  	saver.restore(sess, ckpt.model_checkpoint_path)
     coord = tf.train.Coordinator()
     try:
       threads = []
@@ -117,10 +104,10 @@ def eval_once(eval_data, saver, summary_writer, top_k_op, summary_op):
     coord.join(threads, stop_grace_period_secs=10)
 
 
-def evaluate(eval_data):
-  """Eval CIFAR-10 for a number of steps."""
+def evaluate(eval_data, model_path, global_step ):
+  """Eval CIFAR-100 prediction performance."""
   with tf.Graph().as_default() as g:
-    # Get images and labels for CIFAR-10.
+    # Get images and labels for CIFAR-100
     images, labels = data_utils.inputs(eval_data=eval_data, data_dir = FLAGS.data_dir, batch_size=FLAGS.batch_size)
 
     # Build a Graph that computes the logits predictions from the
@@ -141,7 +128,18 @@ def evaluate(eval_data):
 
     summary_writer = tf.train.SummaryWriter(FLAGS.eval_dir, g)
 
-    eval_once(eval_data, saver, summary_writer, top_k_op, summary_op)
+    eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_op, summary_op)
+
+
+def choose_and_load_model():
+    ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
+    if ckpt and ckpt.model_checkpoint_path:
+      print('Using model located at: '+ckpt.model_checkpoint_path)
+      global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
+      return ckpt.model_checkpoint_path, global_step
+    else:
+      print('No checkpoint file found exiting')
+      return None, None
 
 def main(argv=None):  # pylint: disable=unused-argument
   conv_net.maybe_download_and_extract()
@@ -150,9 +148,11 @@ def main(argv=None):  # pylint: disable=unused-argument
   tf.gfile.MakeDirs(FLAGS.eval_dir)
   if not tf.gfile.Exists(os.path.join(os.getcwd(),FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(os.getcwd(), FLAGS.data_dir,'val-split.bin')):
 	data_utils.split_train_file(os.path.join(os.getcwd(),FLAGS.data_dir))
-  evaluate('train')  #
-  evaluate('val')
-  evaluate('test')
+  model_path, global_step = choose_model()
+  if model_path is not None:
+	  evaluate('train', model_path)  #
+	  evaluate('val', model_path)
+	  evaluate('test' model_path)
 
 if __name__ == '__main__':
   tf.app.run()

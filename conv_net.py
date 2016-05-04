@@ -125,42 +125,6 @@ def _variable_with_weight_decay(name, shape, stddev, wd):
     tf.add_to_collection('losses', weight_decay)
   return var
 
-
-def distorted_inputs():
-  """Construct distorted input for CIFAR training using the Reader ops.
-
-  Returns:
-    images: Images. 4D tensor of [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3] size.
-    labels: Labels. 1D tensor of [batch_size] size.
-
-  Raises:
-    ValueError: If no data_dir
-  """
-  if not FLAGS.data_dir:
-    raise ValueError('Please supply a data_dir')
-  data_dir = FLAGS.data_dir
-  return data_utils.distorted_inputs(data_dir=data_dir, batch_size=FLAGS.batch_size)
-
-
-def inputs(eval_data):
-  """Construct input for CIFAR evaluation using the Reader ops.
-
-  Args:
-    eval_data: bool, indicating if one should use the train or eval data set.
-
-  Returns:
-    images: Images. 4D tensor of [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3] size.
-    labels: Labels. 1D tensor of [batch_size] size.
-
-  Raises:
-    ValueError: If no data_dir
-  """
-  if not FLAGS.data_dir:
-    raise ValueError('Please supply a data_dir')
-  data_dir = FLAGS.data_dir
-  return data_utils.inputs(eval_data=eval_data, data_dir=data_dir, batch_size=FLAGS.batch_size)
-
-
 def inference(images):
   """Build the CIFAR-10 model.
 
@@ -371,7 +335,7 @@ def train_model():
     global_step = tf.Variable(0, trainable=False)
 
     # Get images and labels for CIFAR-10.
-    images, labels = distorted_inputs()
+    images, labels = data_utils.distorted_inputs(data_dir=FLAGS.data_dir, batch_size=FLAGS.batch_size)
 
     # Build a Graph that computes the logits predictions from the
     # inference model.

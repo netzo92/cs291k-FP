@@ -256,7 +256,7 @@ def inference(images):
   return softmax_linear
 
 
-def loss(logits, labels):
+def loss_func(logits, labels):
   """Add L2Loss to all the trainable variables.
 
   Add summary for "Loss" and "Loss/avg".
@@ -395,7 +395,7 @@ def train():
     logits = inference(images)
 
     # Calculate loss.
-    loss = loss(logits, labels)
+    loss = loss_func(logits, labels)
 
     # Build a Graph that trains the model with one batch of examples and
     # updates the model parameters.

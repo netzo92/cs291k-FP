@@ -40,7 +40,7 @@ import time
 import os
 import numpy as np
 import tensorflow as tf
-import conv_net2 as conv_net
+import conv_net
 import data_utils
 FLAGS = tf.app.flags.FLAGS
 

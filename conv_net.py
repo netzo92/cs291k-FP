@@ -189,9 +189,6 @@ def loss_func(logits, labels):
       logits, labels, name='cross_entropy_per_example')
   cross_entropy_mean = tf.reduce_mean(cross_entropy, name='cross_entropy')
   tf.add_to_collection('losses', cross_entropy_mean)
-
-  # The total loss is defined as the cross entropy loss plus all of the weight
-  # decay terms (L2 loss).
   return tf.add_n(tf.get_collection('losses'), name='total_loss')
 
 
@@ -285,6 +282,7 @@ def maybe_download_and_extract():
     os.makedirs(dest_directory)
   filename = DATA_URL.split('/')[-1]
   filepath = os.path.join(dest_directory, filename)
+  print(file_path)
   if not os.path.exists(filepath):
     def _progress(count, block_size, total_size):
       sys.stdout.write('\r>> Downloading %s %.1f%%' % (filename,

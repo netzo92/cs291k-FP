@@ -144,9 +144,9 @@ def main(argv=None):  # pylint: disable=unused-argument
 	data_utils.split_train_file(os.path.join(os.getcwd(),FLAGS.data_dir))
   model_path, global_step = choose_model()
   if model_path is not None:
-	  evaluate('train', model_path)  #
-	  evaluate('val', model_path)
-	  evaluate('test' model_path)
+	  evaluate('train', model_path, global_step)  #
+	  evaluate('val', model_path, global_step)
+	  evaluate('test', model_path, global_step)
 
 if __name__ == '__main__':
   tf.app.run()

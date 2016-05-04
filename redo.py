@@ -125,7 +125,7 @@ def evaluate(eval_data, model_path, global_step ):
     eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_op, summary_op)
 
 
-def choose_and_load_model():
+def choose_model():
     ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
     if ckpt and ckpt.model_checkpoint_path:
       print('Using model located at: '+ckpt.model_checkpoint_path)

@@ -382,7 +382,7 @@ def maybe_download_and_extract():
     tarfile.open(filepath, 'r:gz').extractall(dest_directory)
     data_utils.train_test_split(dest_directory)
 
-def train():
+def train_model():
   """Train CIFAR-10 for a number of steps."""
   with tf.Graph().as_default():
     global_step = tf.Variable(0, trainable=False)
@@ -455,7 +455,7 @@ def main(argv=None):  # pylint: disable=unused-argument
  tf.gfile.MakeDirs(FLAGS.train_dir)
  if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'val-split.bin')):
   data_utils.split_train_file(FLAGS.data_dir)
- train()
+ train_model()
 
 if __name__ == '__main__':
  tf.app.run()

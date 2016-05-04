@@ -101,19 +101,6 @@ def _activation_summary(x):
   tf.scalar_summary(tensor_name + '/sparsity', tf.nn.zero_fraction(x))
 
 
-def _variable_on_cpu(name, shape, initializer):
-  """Helper to create a Variable stored on CPU memory.
-
-  Args:
-    name: name of the variable
-    shape: list of ints
-    initializer: initializer for Variable
-
-  Returns:
-    Variable Tensor
-  """
-  var = tf.get_variable(name, shape, initializer=initializer)
-  return var
 
 
 def _variable_with_weight_decay(name, shape, stddev, wd):
@@ -132,8 +119,7 @@ def _variable_with_weight_decay(name, shape, stddev, wd):
   Returns:
     Variable Tensor
   """
-  var = _variable_on_cpu(name, shape,
-                         tf.truncated_normal_initializer(stddev=stddev))
+  var = tf.get_variable(name, shape, initializer = tf.truncated_normal_initializer(stddev=stddev))
   if wd is not None:
     weight_decay = tf.mul(tf.nn.l2_loss(var), wd, name='weight_loss')
     tf.add_to_collection('losses', weight_decay)
@@ -172,8 +158,7 @@ def inputs(eval_data):
   if not FLAGS.data_dir:
     raise ValueError('Please supply a data_dir')
   data_dir = FLAGS.data_dir
-  return data_utils.inputs(eval_data=eval_data, data_dir=data_dir,
-                              batch_size=FLAGS.batch_size)
+  return data_utils.inputs(eval_data=eval_data, data_dir=data_dir, batch_size=FLAGS.batch_size)
 
 
 def inference(images):
@@ -195,7 +180,7 @@ def inference(images):
     kernel = _variable_with_weight_decay('weights', shape=[5, 5, 3, 64],
                                          stddev=1e-4, wd=0.0)
     conv = tf.nn.conv2d(images, kernel, [1, 1, 1, 1], padding='SAME')
-    biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.0))
+    biases = tf.get_variable('biases', [64], initializer = tf.constant_initializer(0.0))
     bias = tf.nn.bias_add(conv, biases)
     conv1 = tf.nn.relu(bias, name=scope.name)
     _activation_summary(conv1)
@@ -212,7 +197,7 @@ def inference(images):
     kernel = _variable_with_weight_decay('weights', shape=[5, 5, 64, 64],
                                          stddev=1e-4, wd=0.0)
     conv = tf.nn.conv2d(norm1, kernel, [1, 1, 1, 1], padding='SAME')
-    biases = _variable_on_cpu('biases', [64], tf.constant_initializer(0.1))
+    biases = tf.get_variable('biases', [64], initializer = tf.constant_initializer(0.1))
     bias = tf.nn.bias_add(conv, biases)
     conv2 = tf.nn.relu(bias, name=scope.name)
     _activation_summary(conv2)
@@ -231,7 +216,7 @@ def inference(images):
     dim = reshape.get_shape()[1].value
     weights = _variable_with_weight_decay('weights', shape=[dim, 384],
                                           stddev=0.04, wd=0.004)
-    biases = _variable_on_cpu('biases', [384], tf.constant_initializer(0.1))
+    biases = tf.get_variable('biases', [384], initializer = tf.constant_initializer(0.1))
     local3 = tf.nn.relu(tf.matmul(reshape, weights) + biases, name=scope.name)
     _activation_summary(local3)
 
@@ -239,7 +224,7 @@ def inference(images):
   with tf.variable_scope('local4') as scope:
     weights = _variable_with_weight_decay('weights', shape=[384, 192],
                                           stddev=0.04, wd=0.004)
-    biases = _variable_on_cpu('biases', [192], tf.constant_initializer(0.1))
+    biases = tf.get_variable('biases', [192], initializer = tf.constant_initializer(0.1))
     local4 = tf.nn.relu(tf.matmul(local3, weights) + biases, name=scope.name)
     _activation_summary(local4)
 
@@ -247,8 +232,7 @@ def inference(images):
   with tf.variable_scope('softmax_linear') as scope:
     weights = _variable_with_weight_decay('weights', [192, NUM_CLASSES],
                                           stddev=1/192.0, wd=0.0)
-    biases = _variable_on_cpu('biases', [NUM_CLASSES],
-                              tf.constant_initializer(0.0))
+    biases = tf.get_variable('biases', [NUM_CLASSES], initializer = tf.constant_initializer(0.0))
     softmax_linear = tf.add(tf.matmul(local4, weights), biases, name=scope.name)
     _activation_summary(softmax_linear)
 
@@ -307,7 +291,7 @@ def _add_loss_summaries(total_loss):
 
 
 def train(total_loss, global_step):
-  """Train CIFAR-10 model.
+  """Train CIFAR-100 model.
 
   Create an optimizer and apply to all trainable variables. Add moving
   average for all trainable variables.

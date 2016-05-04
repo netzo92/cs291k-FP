@@ -62,14 +62,12 @@ def eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_o
     summary_op: Summary op.
   """
   with tf.Session() as sess:
-  	saver.restore(sess, model_path)
+    saver.restore(sess, model_path)
     coord = tf.train.Coordinator()
     try:
       threads = []
       for qr in tf.get_collection(tf.GraphKeys.QUEUE_RUNNERS):
-        threads.extend(qr.create_threads(sess, coord=coord, daemon=True,
-                                         start=True))
-
+        threads.extend(qr.create_threads(sess, coord=coord, daemon=True, start=True))
       num_iter = int(math.ceil(FLAGS.num_examples / FLAGS.batch_size))
       true_count = 0  # Counts the number of correct predictions.
       total_sample_count = num_iter * FLAGS.batch_size

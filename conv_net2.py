@@ -454,7 +454,7 @@ def main(argv=None):  # pylint: disable=unused-argument
   dir_num += 1
  tf.gfile.MakeDirs(FLAGS.train_dir)
  if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'val-split.bin')):
-  data_utils.test_train_split(FLAGS.data_dir)
+  data_utils.split_train_file(FLAGS.data_dir)
  train()
 
 if __name__ == '__main__':

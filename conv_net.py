@@ -357,8 +357,7 @@ def maybe_download_and_extract():
     statinfo = os.stat(filepath)
     print('Successfully downloaded', filename, statinfo.st_size, 'bytes.')
     tarfile.open(filepath, 'r:gz').extractall(dest_directory)
-    
-  if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'val-split.bin')):
+  if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'cifar-100-binary','train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'cifar-100-binary', 'val-split.bin')):
     print('Train/Validation sets not split, splitting')
     data_utils.split_train_file(FLAGS.data_dir)
 

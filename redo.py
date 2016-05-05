@@ -93,7 +93,7 @@ def evaluate(eval_data, model_path, global_step ):
 
 
 def choose_model():
-    ckpt = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
+    ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir)
     if ckpt and ckpt.model_checkpoint_path:
       print('Using model located at: '+ckpt.model_checkpoint_path)
       global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
@@ -109,8 +109,7 @@ def main(argv=sys.argv):
   if tf.gfile.Exists(FLAGS.eval_dir):
     tf.gfile.DeleteRecursively(FLAGS.eval_dir)
   tf.gfile.MakeDirs(FLAGS.eval_dir)
-  if not tf.gfile.Exists(os.path.join(os.getcwd(),FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(os.getcwd(), FLAGS.data_dir,'val-split.bin')):
-    data_utils.split_train_file(os.path.join(os.getcwd(),FLAGS.data_dir))
+  conv_net.main()
   model_path, global_step = choose_model()
   if model_path is not None:
     evaluate('train', model_path, global_step)  #

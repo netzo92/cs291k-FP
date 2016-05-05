@@ -26,7 +26,7 @@ tf.app.flags.DEFINE_string('data_dir', os.path.join(os.getcwd(),'cifar100_data')
 tf.app.flags.DEFINE_string('train_dir', os.path.join(os.getcwd(),'cifar100_train'),
                            """Directory where to write event logs """
                            """and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', 20000,
+tf.app.flags.DEFINE_integer('max_steps', 2000,
                             """Number of batches to run.""")
 
                             

@@ -166,24 +166,12 @@ def inference(images):
                                           stddev=1/192.0, wd=0.0)
     biases = tf.get_variable('biases', [NUM_CLASSES], initializer = tf.constant_initializer(0.0))
     softmax_linear = tf.add(tf.matmul(local4, weights), biases, name=scope.name)
+    softmax_norm = tf.nn.softmax(softmax_linear, name = 'softmax_final')
     _activation_summary(softmax_linear)
-
-  return softmax_linear
+  return softmax_norm
 
 
 def loss_func(logits, labels):
-  """Add L2Loss to all the trainable variables.
-
-  Add summary for "Loss" and "Loss/avg".
-  Args:
-    logits: Logits from inference().
-    labels: Labels from distorted_inputs or inputs(). 1-D tensor
-            of shape [batch_size]
-
-  Returns:
-    Loss tensor of type float.
-  """
-  # Calculate the average cross entropy loss across the batch.
   labels = tf.cast(labels, tf.int64)
   cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(
       logits, labels, name='cross_entropy_per_example')
@@ -193,17 +181,6 @@ def loss_func(logits, labels):
 
 
 def _add_loss_summaries(total_loss):
-  """Add summaries for losses in CIFAR-10 model.
-
-  Generates moving average for all losses and associated summaries for
-  visualizing the performance of the network.
-
-  Args:
-    total_loss: Total loss from loss().
-  Returns:
-    loss_averages_op: op for generating moving averages of losses.
-  """
-  # Compute the moving average of all individual losses and the total loss.
   loss_averages = tf.train.ExponentialMovingAverage(0.9, name='avg')
   losses = tf.get_collection('losses')
   loss_averages_op = loss_averages.apply(losses + [total_loss])

@@ -74,9 +74,9 @@ def evaluate(eval_data, model_path, global_step ):
     # Build a Graph that computes the logits predictions from the
     # inference model.
     logits = conv_net.inference(images)
-
+    logits_norm = tf.nn.softmax(logits)
     # Calculate predictions.
-    top_k_op = tf.nn.in_top_k(logits, labels, 1)
+    top_k_op = tf.nn.in_top_k(logits_norm, labels, 1)
 
     # Restore the moving average version of the learned variables for eval.
     variable_averages = tf.train.ExponentialMovingAverage(
@@ -109,7 +109,7 @@ def main(argv=sys.argv):
   if tf.gfile.Exists(FLAGS.eval_dir):
     tf.gfile.DeleteRecursively(FLAGS.eval_dir)
   tf.gfile.MakeDirs(FLAGS.eval_dir)
-  #conv_net.main()
+  conv_net.main()
   model_path, global_step = choose_model()
   if model_path is not None:
     evaluate('train', model_path, global_step)  #

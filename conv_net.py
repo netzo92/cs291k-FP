@@ -347,7 +347,7 @@ def maybe_download_and_extract():
   if not os.path.exists(non_compressed_filepath) and os.path.exists(filepath):
     print('Compressed file found, decompressing')
     tarfile.open(filepath, 'r:gz').extractall(dest_directory)
-  elif not os.path.exists(filepath):
+  elif not os.path.exists(filepath) and not os.path.exists(non_compressed_filepath):
     def _progress(count, block_size, total_size):
       sys.stdout.write('\r>> Downloading %s %.1f%%' % (filename,
           float(count * block_size) / float(total_size) * 100.0))
@@ -357,6 +357,7 @@ def maybe_download_and_extract():
     statinfo = os.stat(filepath)
     print('Successfully downloaded', filename, statinfo.st_size, 'bytes.')
     tarfile.open(filepath, 'r:gz').extractall(dest_directory)
+    
   if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'val-split.bin')):
     print('Train/Validation sets not split, splitting')
     data_utils.split_train_file(FLAGS.data_dir)

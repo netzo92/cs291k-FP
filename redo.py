@@ -109,7 +109,7 @@ def main(argv=sys.argv):
   if tf.gfile.Exists(FLAGS.eval_dir):
     tf.gfile.DeleteRecursively(FLAGS.eval_dir)
   tf.gfile.MakeDirs(FLAGS.eval_dir)
-  conv_net.main()
+  #conv_net.main()
   model_path, global_step = choose_model()
   if model_path is not None:
     evaluate('train', model_path, global_step)  #

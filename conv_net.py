@@ -166,9 +166,8 @@ def inference(images):
                                           stddev=1/192.0, wd=0.0)
     biases = tf.get_variable('biases', [NUM_CLASSES], initializer = tf.constant_initializer(0.0))
     softmax_linear = tf.add(tf.matmul(local4, weights), biases, name=scope.name)
-    softmax_norm = tf.nn.softmax(softmax_linear, name = 'softmax_final')
     _activation_summary(softmax_linear)
-  return softmax_norm
+  return softmax_linear
 
 
 def loss_func(logits, labels):

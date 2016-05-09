@@ -29,23 +29,23 @@ def eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_o
     summary_op: Summary op.
   """
   with tf.Session() as sess:
-    saver.restore(sess, model_path)
-    coord = tf.train.Coordinator()
+    saver.restore(sess, model_path) //load variables to saved model
+    coord = tf.train.Coordinator() #create coordinator object, used to stop and join on all threads
     try:
-      threads = []
-      for qr in tf.get_collection(tf.GraphKeys.QUEUE_RUNNERS):
-        threads.extend(qr.create_threads(sess, coord=coord, daemon=True, start=True))
+      threads = []  #init initial empty list used for threads
+      for qr in tf.get_collection(tf.GraphKeys.QUEUE_RUNNERS):  #Add all current queue runners to this list.
+        threads.extend(qr.create_threads(sess, coord=coord, daemon=True, start=True)) #Start and append these queue runners
       num_iter = int(math.ceil(FLAGS.num_examples / FLAGS.batch_size))
       true_count = 0  # Counts the number of correct predictions.
       total_sample_count = num_iter * FLAGS.batch_size
       step = 0
       while step < num_iter and not coord.should_stop():
-        predictions = sess.run([top_k_op])
-        true_count += np.sum(predictions)
+        predictions = sess.run([top_k_op])  #Compute which predictions were correct.
+        true_count += np.sum(predictions)   #Add up the total number of good guesses
         step += 1
 
-      # Compute precision @ 1.
-      precision = true_count / total_sample_count
+      
+      precision = true_count / total_sample_count # Compute performance accuracy
       if eval_data is 'test':
         print('Testing Accuracy:  %.3f' % (precision))
       elif eval_data is 'train':
@@ -61,7 +61,7 @@ def eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_o
     except Exception as e:  # pylint: disable=broad-except
       coord.request_stop(e)
 
-    coord.request_stop()
+    coord.request_stop() #Using the coordinator to request_stop from threads
     coord.join(threads, stop_grace_period_secs=10)
 
 
@@ -69,14 +69,14 @@ def evaluate(eval_data, model_path, global_step ):
   """Eval CIFAR-100 prediction performance."""
   with tf.Graph().as_default() as g:
     # Get images and labels for CIFAR-100
-    images, labels = data_utils.inputs(eval_data=eval_data, data_dir = FLAGS.data_dir, batch_size=FLAGS.batch_size)
+    images, labels = data_utils.inputs(eval_data=eval_data, data_dir = FLAGS.data_dir, batch_size=FLAGS.batch_size) #Get batches
 
     # Build a Graph that computes the logits predictions from the
     # inference model.
-    logits = conv_net.inference(images)
-    logits_norm = tf.nn.softmax(logits)
+    logits = conv_net.inference(images)   #Run predictions on the images
+    logits_norm = tf.nn.softmax(logits)   #Check the softmax of the images, this should normalize our scores for predictions
     # Calculate predictions.
-    top_k_op = tf.nn.in_top_k(logits_norm, labels, 1)
+    top_k_op = tf.nn.in_top_k(logits_norm, labels, 1) #Get the highest ranked logit_norms
 
     # Restore the moving average version of the learned variables for eval.
     variable_averages = tf.train.ExponentialMovingAverage(
@@ -93,7 +93,7 @@ def evaluate(eval_data, model_path, global_step ):
 
 
 def choose_model():
-    ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir)
+    ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir) #Use this for opening the model that we just trained.
     if ckpt and ckpt.model_checkpoint_path:
       print('Using model located at: '+ckpt.model_checkpoint_path)
       global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]

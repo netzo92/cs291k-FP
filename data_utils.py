@@ -60,14 +60,14 @@ def read_cifar100(filename_queue):
       uint8image: a [height, width, depth] uint8 Tensor with the image data
   """
 
-  class CIFAR100Record(object):
+  class CIFAR100Record(object): #Creates a place holder object name to act like a dictionary to store data.
     pass
   result = CIFAR100Record()
 
   # Dimensions of the images in the CIFAR-10 dataset.
   # See http://www.cs.toronto.edu/~kriz/cifar.html for a description of the
   # input format.
-  label_bytes = 2 # 2 for CIFAR-100
+  label_bytes = 2 # 2 for CIFAR-100, even though we are only using one label.
   start_at_bytes = 2
   result.height = 32
   result.width = 32
@@ -75,7 +75,7 @@ def read_cifar100(filename_queue):
   image_bytes = result.height * result.width * result.depth
   # Every record consists of a label followed by the image, with a
   # fixed number of bytes for each.
-  record_bytes = label_bytes + image_bytes
+  record_bytes = label_bytes + image_bytes #two label bytres
 
   # Read a record, getting filenames from the filename_queue.  No
   # header or footer in the CIFAR-10 format, so we leave header_bytes
@@ -85,7 +85,7 @@ def read_cifar100(filename_queue):
 
   record_bytes = tf.decode_raw(value, tf.uint8)
   result.label = tf.cast(
-      tf.slice(record_bytes, [0], [1]), tf.int32)
+      tf.slice(record_bytes, [0], [1]), tf.int32) #only snip out the course label
 
   # The remaining bytes after the label represent the image, which we reshape
   # from [depth * height * width] to [depth, height, width].
@@ -115,22 +115,22 @@ def _generate_image_and_label_batch(image, label, min_queue_examples,
   # Create a queue that shuffles the examples, and then
   # read 'batch_size' images + labels from the example queue.
   num_preprocess_threads = 16
-  if shuffle:
+  if shuffle:   #In both of these batch subcalls, notice enqueue_many is false
     images, label_batch = tf.train.shuffle_batch(
         [image, label],
         batch_size=batch_size,
         num_threads=num_preprocess_threads,
         capacity=min_queue_examples + 3 * batch_size,
         min_after_dequeue=min_queue_examples)
-  else:
+  else: #Enqueue many is false
     images, label_batch = tf.train.batch(
         [image, label],
         batch_size=batch_size,
         num_threads=num_preprocess_threads,
         capacity=min_queue_examples + 3 * batch_size)
 
-  # Display the training images in the visualizer.
-  tf.image_summary('images', images)
+
+  tf.image_summary('images', images)    # Display the training images in the visualizer.
 
   return images, tf.reshape(label_batch, [batch_size])
 
@@ -143,10 +143,10 @@ def distorted_inputs(data_dir, batch_size):
       raise ValueError('Failed to find file: ' + f)
 
   # Create a queue that produces the filenames to read.
-  filename_queue = tf.train.string_input_producer(filenames)
+  filename_queue = tf.train.string_input_producer(filenames)    #This was originally used because the CIFAR10 training had 5 training files
 
   # Read examples from files in the filename queue.
-  read_input = read_cifar100(filename_queue)
+  read_input = read_cifar100(filename_queue) #pass filename queue into record-reading method
   reshaped_image = tf.cast(read_input.uint8image, tf.float32)
 
   height = IMAGE_SIZE

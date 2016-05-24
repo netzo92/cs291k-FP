@@ -42,9 +42,9 @@ def split_train_file(location):
     num_val = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*0.1
     k = [0]*int(num_train)+[1]*int(num_val)
     random.shuffle(k)
-    with open(os.path.join(location,'cifar-100-binary', 'train.bin'), 'r') as f:
-        train_split_file = open(os.path.join(location,'cifar-100-binary', 'train-split.bin'),'w')
-        test_split_file = open(os.path.join(location,'cifar-100-binary', 'val-split.bin'),'w')
+    with open(os.path.join(location,'cifar-10-binary', 'train.bin'), 'r') as f:
+        train_split_file = open(os.path.join(location,'cifar-10-binary', 'train-split.bin'),'w')
+        test_split_file = open(os.path.join(location,'cifar-10-binary', 'val-split.bin'),'w')
         for val in k:
             data = f.read(2+32*32*4)
             if val is 0:
@@ -77,9 +77,9 @@ def read_cifar100(filename_queue):
       uint8image: a [height, width, depth] uint8 Tensor with the image data
   """
 
-  class CIFAR100Record(object): #Creates a place holder object name to act like a dictionary to store data.
+  class CIFAR10Record(object): #Creates a place holder object name to act like a dictionary to store data.
     pass
-  result = CIFAR100Record()
+  result = CIFAR10Record()
 
   # Dimensions of the images in the CIFAR-10 dataset.
   # See http://www.cs.toronto.edu/~kriz/cifar.html for a description of the
@@ -88,7 +88,7 @@ def read_cifar100(filename_queue):
   start_at_bytes = 1
   result.height = 32
   result.width = 32
-  result.depth = 4 # or 4
+  result.depth = 4 # or ( R G B D)
   image_bytes = result.height * result.width * result.depth
   # Every record consists of a label followed by the image, with a
   # fixed number of bytes for each.

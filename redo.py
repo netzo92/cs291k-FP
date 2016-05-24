@@ -120,7 +120,6 @@ def choose_model():
 def main(argv=sys.argv):
   if len(sys.argv) > 1:
     FLAGS.data_dir = sys.argv[1]
-  conv_net.maybe_download_and_extract()
   if tf.gfile.Exists(FLAGS.eval_dir):
     tf.gfile.DeleteRecursively(FLAGS.eval_dir)
   tf.gfile.MakeDirs(FLAGS.eval_dir)

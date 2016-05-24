@@ -26,9 +26,9 @@ import conv_net
 import data_utils
 FLAGS = tf.app.flags.FLAGS
 
-tf.app.flags.DEFINE_string('eval_dir', os.path.join(os.getcwd(),'cifar100_eval'),
+tf.app.flags.DEFINE_string('eval_dir', os.path.join(os.getcwd(),'cifar10_eval'),
                            """Directory where to write event logs.""")
-tf.app.flags.DEFINE_string('checkpoint_dir', os.path.join(os.getcwd(),'cifar100_train'),
+tf.app.flags.DEFINE_string('checkpoint_dir', os.path.join(os.getcwd(),'cifar10_train'),
                            """Directory where to read model checkpoints.""")
 tf.app.flags.DEFINE_integer('num_examples', 10000,
                             """Number of examples to run.""")

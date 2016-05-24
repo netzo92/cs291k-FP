@@ -35,7 +35,7 @@ FLAGS = tf.app.flags.FLAGS
 # Basic model parameters.
 tf.app.flags.DEFINE_integer('batch_size', 128,
                             """Number of images to process in a batch.""")
-tf.app.flags.DEFINE_string('data_dir', os.path.join(os.getcwd(),'cifar100_data'),
+tf.app.flags.DEFINE_string('data_dir', os.path.join(os.getcwd(),'cifar10_data'),
                            """Path to the CIFAR-10 data directory.""")
 tf.app.flags.DEFINE_string('train_dir', os.path.join(os.getcwd(),'cifar100_train'),
                            """Directory where to write event logs """
@@ -326,36 +326,10 @@ def train_model():
         checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
         saver.save(sess, checkpoint_path, global_step=step)
 
-def maybe_download_and_extract():
-  """Download and extract the tarball from Alex's website."""
-  dest_directory = FLAGS.data_dir
-  if not os.path.exists(dest_directory):
-    os.makedirs(dest_directory)
-  filename = DATA_URL.split('/')[-1]
-  filepath = os.path.join(dest_directory, filename)
-  non_compressed_filepath = filepath.rsplit('.', 2)[0]
-  if not os.path.exists(non_compressed_filepath) and os.path.exists(filepath):
-    print('Compressed file found, decompressing')
-    tarfile.open(filepath, 'r:gz').extractall(dest_directory)
-  elif not os.path.exists(filepath) and not os.path.exists(non_compressed_filepath):
-    def _progress(count, block_size, total_size):
-      sys.stdout.write('\r>> Downloading %s %.1f%%' % (filename,
-          float(count * block_size) / float(total_size) * 100.0))
-      sys.stdout.flush()
-    filepath, _ = urllib.request.urlretrieve(DATA_URL, filepath, _progress)
-    print()
-    statinfo = os.stat(filepath)
-    print('Successfully downloaded', filename, statinfo.st_size, 'bytes.')
-    tarfile.open(filepath, 'r:gz').extractall(dest_directory)
-  if not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'cifar-100-binary','train-split.bin')) or not tf.gfile.Exists(os.path.join(FLAGS.data_dir,'cifar-100-binary', 'val-split.bin')):
-    print('Train/Validation sets not split, splitting')
-    data_utils.split_train_file(FLAGS.data_dir)
-
 def main(argv=None):  # pylint: disable=unused-argument
- maybe_download_and_extract()
  dir_num = 1
  while tf.gfile.Exists(FLAGS.train_dir):
-  FLAGS.train_dir = os.path.join(os.getcwd(),'cifar100_train'+str(dir_num))
+  FLAGS.train_dir = os.path.join(os.getcwd(),'cifar10_train'+str(dir_num))
   dir_num += 1
  tf.gfile.MakeDirs(FLAGS.train_dir)
  train_model()

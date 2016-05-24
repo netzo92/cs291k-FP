@@ -44,7 +44,7 @@ def eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_o
     summary_op: Summary op.
   """
   with tf.Session() as sess:
-    saver.restore(sess, model_path) //load variables to saved model
+    saver.restore(sess, model_path) #load variables to saved model
     coord = tf.train.Coordinator() #create coordinator object, used to stop and join on all threads
     try:
       threads = []  #init initial empty list used for threads

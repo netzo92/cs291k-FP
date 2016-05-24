@@ -32,30 +32,13 @@ IMAGE_SIZE = 24
 
 # Global constants describing the CIFAR-10 data set.
 NUM_CLASSES = 20
-NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 50000
-NUM_EXAMPLES_PER_EPOCH_FOR_VAL = 10000
-NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 10000
+NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN = 34621
+NUM_EXAMPLES_PER_EPOCH_FOR_VAL = 1923
+NUM_EXAMPLES_PER_EPOCH_FOR_EVAL = 1923
 
 
-def split_train_file(location):
-    num_train = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*0.9
-    num_val = NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*0.1
-    k = [0]*int(num_train)+[1]*int(num_val)
-    random.shuffle(k)
-    with open(os.path.join(location,'cifar-10-binary', 'train.bin'), 'r') as f:
-        train_split_file = open(os.path.join(location,'cifar-10-binary', 'train-split.bin'),'w')
-        test_split_file = open(os.path.join(location,'cifar-10-binary', 'val-split.bin'),'w')
-        for val in k:
-            data = f.read(2+32*32*4)
-            if val is 0:
-                train_split_file.write(data)
-            elif val is 1:
-                test_split_file.write(data)
-        train_split_file.close()
-        test_split_file.close()
-    
 
-def read_cifar100(filename_queue):
+def read_cifar10(filename_queue):
   """Reads and parses examples from CIFAR10 data files.
 
   Recommendation: if you want N-way read parallelism, call this function
@@ -153,7 +136,7 @@ def _generate_image_and_label_batch(image, label, min_queue_examples,
 
 
 def distorted_inputs(data_dir, batch_size):
-  filenames = [os.path.join(os.getcwd(), data_dir,'cifar-100-binary', 'train-split.bin')]
+  filenames = [os.path.join(os.getcwd(), data_dir,'cifar-10-binary', 'data_batch-train.bin')]
   
   for f in filenames:
     if not tf.gfile.Exists(f):
@@ -163,7 +146,7 @@ def distorted_inputs(data_dir, batch_size):
   filename_queue = tf.train.string_input_producer(filenames)    #This was originally used because the CIFAR10 training had 5 training files
 
   # Read examples from files in the filename queue.
-  read_input = read_cifar100(filename_queue) #pass filename queue into record-reading method
+  read_input = read_cifar10(filename_queue) #pass filename queue into record-reading method
   reshaped_image = tf.cast(read_input.uint8image, tf.float32)
 
   height = IMAGE_SIZE
@@ -200,13 +183,13 @@ def distorted_inputs(data_dir, batch_size):
 
 def inputs(eval_data, data_dir, batch_size):
   if eval_data is "train":
-    filenames = [os.path.join(data_dir,'cifar-100-binary', 'train-split.bin')]
-    num_examples_per_epoch = int(NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*0.9)
+    filenames = [os.path.join(data_dir,'cifar-10-binary', 'data_batch-train.bin')]
+    num_examples_per_epoch = int(NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*0.)
   elif eval_data is "test":
-    filenames = [os.path.join(data_dir,'cifar-100-binary', 'test.bin')]
+    filenames = [os.path.join(data_dir,'cifar-10-binary', 'data_batch-test.bin')]
     num_examples_per_epoch = NUM_EXAMPLES_PER_EPOCH_FOR_EVAL
   elif eval_data is 'val':
-    filenames = [os.path.join(data_dir, 'cifar-100-binary','val-split.bin')]
+    filenames = [os.path.join(data_dir, 'cifar-10-binary','data_batch-val.bin')]
     num_examples_per_epoch = int(NUM_EXAMPLES_PER_EPOCH_FOR_TRAIN*(0.1))
   for f in filenames:
     if not tf.gfile.Exists(f):

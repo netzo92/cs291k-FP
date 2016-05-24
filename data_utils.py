@@ -46,7 +46,7 @@ def split_train_file(location):
         train_split_file = open(os.path.join(location,'cifar-100-binary', 'train-split.bin'),'w')
         test_split_file = open(os.path.join(location,'cifar-100-binary', 'val-split.bin'),'w')
         for val in k:
-            data = f.read(2+32*32*3)
+            data = f.read(2+32*32*4)
             if val is 0:
                 train_split_file.write(data)
             elif val is 1:
@@ -84,11 +84,11 @@ def read_cifar100(filename_queue):
   # Dimensions of the images in the CIFAR-10 dataset.
   # See http://www.cs.toronto.edu/~kriz/cifar.html for a description of the
   # input format.
-  label_bytes = 2 # 2 for CIFAR-100, even though we are only using one label.
-  start_at_bytes = 2
+  label_bytes = 1 # 2 for CIFAR-100, even though we are only using one label.
+  start_at_bytes = 1
   result.height = 32
   result.width = 32
-  result.depth = 3
+  result.depth = 4 # or 4
   image_bytes = result.height * result.width * result.depth
   # Every record consists of a label followed by the image, with a
   # fixed number of bytes for each.
@@ -102,11 +102,11 @@ def read_cifar100(filename_queue):
 
   record_bytes = tf.decode_raw(value, tf.uint8)
   result.label = tf.cast(
-      tf.slice(record_bytes, [0], [1]), tf.int32) #only snip out the course label
+      tf.slice(record_bytes, [0], [label_bytes]), tf.int32) #only snip out the course label
 
   # The remaining bytes after the label represent the image, which we reshape
   # from [depth * height * width] to [depth, height, width].
-  depth_major = tf.reshape(tf.slice(record_bytes, [2], [image_bytes]),
+  depth_major = tf.reshape(tf.slice(record_bytes, [1], [image_bytes]),
                            [result.depth, result.height, result.width])
   # Convert from [depth, height, width] to [height, width, depth].
   result.uint8image = tf.transpose(depth_major, [1, 2, 0])

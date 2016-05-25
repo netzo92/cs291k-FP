@@ -71,11 +71,11 @@ def read_cifar10(filename_queue):
   start_at_bytes = 1
   result.height = 32
   result.width = 32
-  result.depth = 4 # or ( R G B D)
+  result.depth = FLAGS.depth # or ( R G B D)
   image_bytes = result.height * result.width * result.depth
   # Every record consists of a label followed by the image, with a
   # fixed number of bytes for each.
-  record_bytes = label_bytes + image_bytes #two label bytres
+  record_bytes = label_bytes + 32*32*4  #two label bytres
 
   # Read a record, getting filenames from the filename_queue.  No
   # header or footer in the CIFAR-10 format, so we leave header_bytes
@@ -156,7 +156,7 @@ def distorted_inputs(data_dir, batch_size):
   # distortions applied to the image.
 
   # Randomly crop a [height, width] section of the image.
-  distorted_image = tf.random_crop(reshaped_image, [height, width, 4])
+  distorted_image = tf.random_crop(reshaped_image, [height, width, FLAGS.depth])
 
   # Randomly flip the image horizontally.
   distorted_image = tf.image.random_flip_left_right(distorted_image)

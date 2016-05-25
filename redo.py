@@ -110,7 +110,7 @@ def evaluate(eval_data, model_path, global_step ):
 def choose_model():
     ckpt = tf.train.get_checkpoint_state(FLAGS.train_dir) #Use this for opening the model that we just trained.
     if ckpt and ckpt.model_checkpoint_path:
-      print('Using model located at: '+ckpt.model_checkpoint_path)
+      
       global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
       return ckpt.model_checkpoint_path, global_step
     else:
@@ -129,10 +129,11 @@ def main(argv=sys.argv):
   models = []
   model_path_prefix = model_path.rsplit('-',1)[0]
   
-  while curr_model_num < int(global_step):
+  while curr_model_num <= int(global_step):
     models.append((model_path_prefix+'-'+str(curr_model_num),curr_model_num))
     curr_model_num += 250
   for model in models:
+    print('Using model located at: '+model[0])
     evaluate('train', model[0], model[1])  #
     evaluate('val', model[0], model[1])
     evaluate('test', model[0], model[1])

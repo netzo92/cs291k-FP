@@ -42,7 +42,8 @@ tf.app.flags.DEFINE_string('train_dir', os.path.join(os.getcwd(),'cifar100_train
                            """and checkpoint.""")
 tf.app.flags.DEFINE_integer('max_steps', 7000,
                             """Number of batches to run.""")
-
+tf.app.flags.DEFINE_integer('depth', 4,
+                            """Pixel depth. Num uint8s per pixel""")
                             
 # Global constants describing the CIFAR-10 data set.
 IMAGE_SIZE = data_utils.IMAGE_SIZE
@@ -123,7 +124,7 @@ def inference(images):
   #
   # conv1
   with tf.variable_scope('conv1') as scope:
-    kernel = _variable_with_weight_decay('weights', shape=[5, 5, 4, 64],
+    kernel = _variable_with_weight_decay('weights', shape=[5, 5, FLAGS.depth, 64],
                                          stddev=1e-4, wd=0.0)
     conv = tf.nn.conv2d(images, kernel, [1, 1, 1, 1], padding='SAME')
     biases = tf.get_variable('biases', [64], initializer = tf.constant_initializer(0.0))
@@ -322,7 +323,7 @@ def train_model():
         summary_writer.add_summary(summary_str, step)
 
       # Save the model checkpoint periodically.
-      if step % 1000 == 0 or (step + 1) == FLAGS.max_steps:
+      if step % 500 == 0 or (step + 1) == FLAGS.max_steps:
         checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
         saver.save(sess, checkpoint_path, global_step=step)
 

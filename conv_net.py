@@ -40,7 +40,7 @@ tf.app.flags.DEFINE_string('data_dir', os.path.join(os.getcwd(),'cifar10_data'),
 tf.app.flags.DEFINE_string('train_dir', os.path.join(os.getcwd(),'cifar100_train'),
                            """Directory where to write event logs """
                            """and checkpoint.""")
-tf.app.flags.DEFINE_integer('max_steps', 251,
+tf.app.flags.DEFINE_integer('max_steps', 6001,
                             """Number of batches to run.""")
 tf.app.flags.DEFINE_integer('depth', 4,
                             """Pixel depth. Num uint8s per pixel""")

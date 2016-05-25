@@ -125,10 +125,17 @@ def main(argv=sys.argv):
   tf.gfile.MakeDirs(FLAGS.eval_dir)
   conv_net.main()
   model_path, global_step = choose_model()
-  if model_path is not None:
-    evaluate('train', model_path, global_step)  #
-    evaluate('val', model_path, global_step)
-    evaluate('test', model_path, global_step)
+  curr_model_num = 0
+  models = []
+  model_path_prefix = model_path.rsplit('-',1)[0]
+  
+  while curr_model_num < int(global_step):
+    models.append((model_path_prefix+str(curr_model_num),curr_model_num))
+    curr_model_num += 250
+  for model in models:
+    evaluate('train', model[0], model[1])  #
+    evaluate('val', model[0], model[1])
+    evaluate('test', model[0], model[1])
 
 if __name__ == '__main__':
   tf.app.run()

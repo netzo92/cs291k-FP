@@ -16,6 +16,7 @@ def open_py_data(file_name):
         print(Y.shape)
         X = np.array(X)
         Y = np.array(Y)
+        print(Y)
         Y = Y.reshape((Y.shape[0],1))
         labels_and_data = np.hstack((Y,X))
         return labels_and_data.astype('uint8')

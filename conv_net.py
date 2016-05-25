@@ -42,7 +42,7 @@ tf.app.flags.DEFINE_string('train_dir', os.path.join(os.getcwd(),'cifar100_train
                            """and checkpoint.""")
 tf.app.flags.DEFINE_integer('max_steps', 6001,
                             """Number of batches to run.""")
-tf.app.flags.DEFINE_integer('depth', 4,
+tf.app.flags.DEFINE_integer('depth', 3,
                             """Pixel depth. Num uint8s per pixel""")
                             
 # Global constants describing the CIFAR-10 data set.

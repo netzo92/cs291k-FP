@@ -120,14 +120,14 @@ def evaluate(eval_data, model_path, global_step ):
 
     # Build a Graph that computes the logits predictions from the
     # inference model.
-    logits = conv_net.inference(images)   #Run predictions on the images
+    logits = inference(images)   #Run predictions on the images
     logits_norm = tf.nn.softmax(logits)   #Check the softmax of the images, this should normalize our scores for predictions
     # Calculate predictions.
     top_k_op = tf.nn.in_top_k(logits_norm, labels, 1) #Get the highest ranked logit_norms
 
     # Restore the moving average version of the learned variables for eval.
     variable_averages = tf.train.ExponentialMovingAverage(
-        conv_net.MOVING_AVERAGE_DECAY)
+        MOVING_AVERAGE_DECAY)
     variables_to_restore = variable_averages.variables_to_restore()
     saver = tf.train.Saver(variables_to_restore)
 

@@ -323,9 +323,12 @@ def train_model():
         summary_writer.add_summary(summary_str, step)
 
       # Save the model checkpoint periodically.
-      if step % 500 == 0 or (step + 1) == FLAGS.max_steps:
+      if step % 250 == 0 or (step + 1) == FLAGS.max_steps:
         checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
         saver.save(sess, checkpoint_path, global_step=step)
+        evaluate('train', checkpoint_path, step) 
+        evaluate('val', checkpoint_path, step) 
+        evaluate('test', checkpoint_path, step) 
 
 def main(argv=None):  # pylint: disable=unused-argument
  dir_num = 1

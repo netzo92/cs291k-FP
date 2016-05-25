@@ -130,7 +130,7 @@ def main(argv=sys.argv):
   model_path_prefix = model_path.rsplit('-',1)[0]
   
   while curr_model_num < int(global_step):
-    models.append((model_path_prefix+str(curr_model_num),curr_model_num))
+    models.append((model_path_prefix+'-'+str(curr_model_num),curr_model_num))
     curr_model_num += 250
   for model in models:
     evaluate('train', model[0], model[1])  #

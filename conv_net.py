@@ -23,7 +23,7 @@ import re
 import sys
 import tarfile
 from datetime import datetime
-import time
+import time, math
 
 from six.moves import urllib, xrange
 import tensorflow as tf

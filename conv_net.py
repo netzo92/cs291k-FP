@@ -29,7 +29,7 @@ from six.moves import urllib, xrange
 import tensorflow as tf
 import numpy as np
 import data_utils
-import redo
+
 FLAGS = tf.app.flags.FLAGS
 
 # Basic model parameters.
@@ -400,9 +400,9 @@ def train_model():
       if step % 250 == 0 or (step + 1) == FLAGS.max_steps:
         checkpoint_path = os.path.join(FLAGS.train_dir, 'model.ckpt')
         saver.save(sess, checkpoint_path, global_step=step)
-        redo.evaluate('train', checkpoint_path, step) 
-        redo.evaluate('val', checkpoint_path, step) 
-        redo.evaluate('test', checkpoint_path, step) 
+        evaluate('train', checkpoint_path, step) 
+        evaluate('val', checkpoint_path, step) 
+        evaluate('test', checkpoint_path, step) 
 
 def main(argv=None):  # pylint: disable=unused-argument
  dir_num = 1

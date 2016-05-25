@@ -66,6 +66,80 @@ TOWER_NAME = 'tower'
 DATA_URL = 'http://www.cs.toronto.edu/~kriz/cifar-100-binary.tar.gz'
 
 
+def eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_op, summary_op):
+  """Run Eval once.
+
+  Args:
+    saver: Saver.
+    summary_writer: Summary writer.
+    top_k_op: Top K op.
+    summary_op: Summary op.
+  """
+  with tf.Session() as sess:
+    saver.restore(sess, model_path) #load variables to saved model
+    coord = tf.train.Coordinator() #create coordinator object, used to stop and join on all threads
+    try:
+      threads = []  #init initial empty list used for threads
+      for qr in tf.get_collection(tf.GraphKeys.QUEUE_RUNNERS):  #Add all current queue runners to this list.
+        threads.extend(qr.create_threads(sess, coord=coord, daemon=True, start=True)) #Start and append these queue runners
+      num_iter = int(math.ceil(FLAGS.num_examples / FLAGS.batch_size))
+      true_count = 0  # Counts the number of correct predictions.
+      total_sample_count = num_iter * FLAGS.batch_size
+      step = 0
+      while step < num_iter and not coord.should_stop():
+        predictions = sess.run([top_k_op])  #Compute which predictions were correct.
+        true_count += np.sum(predictions)   #Add up the total number of good guesses
+        step += 1
+
+      
+      precision = true_count / total_sample_count # Compute performance accuracy
+      if eval_data is 'test':
+        print('Testing Accuracy:  %.3f' % (precision))
+      elif eval_data is 'train':
+        print('Training Accuracy:  %.3f'%(precision))
+      elif eval_data is 'val':
+        print('Validation Accuracy:  %.3f'%(precision))
+
+
+      summary = tf.Summary()
+      summary.ParseFromString(sess.run(summary_op))
+      summary.value.add(tag='Precision @ 1', simple_value=precision)
+      summary_writer.add_summary(summary, global_step)
+    except Exception as e:  # pylint: disable=broad-except
+      coord.request_stop(e)
+
+    coord.request_stop() #Using the coordinator to request_stop from threads
+    coord.join(threads, stop_grace_period_secs=10)
+
+
+def evaluate(eval_data, model_path, global_step ):
+  """Eval CIFAR-100 prediction performance."""
+  with tf.Graph().as_default() as g:
+    # Get images and labels for CIFAR-100
+    images, labels = data_utils.inputs(eval_data=eval_data, data_dir = FLAGS.data_dir, batch_size=FLAGS.batch_size) #Get batches
+
+    # Build a Graph that computes the logits predictions from the
+    # inference model.
+    logits = conv_net.inference(images)   #Run predictions on the images
+    logits_norm = tf.nn.softmax(logits)   #Check the softmax of the images, this should normalize our scores for predictions
+    # Calculate predictions.
+    top_k_op = tf.nn.in_top_k(logits_norm, labels, 1) #Get the highest ranked logit_norms
+
+    # Restore the moving average version of the learned variables for eval.
+    variable_averages = tf.train.ExponentialMovingAverage(
+        conv_net.MOVING_AVERAGE_DECAY)
+    variables_to_restore = variable_averages.variables_to_restore()
+    saver = tf.train.Saver(variables_to_restore)
+
+    # Build the summary operation based on the TF collection of Summaries.
+    summary_op = tf.merge_all_summaries()
+
+    summary_writer = tf.train.SummaryWriter(FLAGS.eval_dir, g)
+
+    eval_once(eval_data, model_path, global_step, saver, summary_writer, top_k_op, summary_op)
+
+
+
 def _activation_summary(x):
   """Helper to create summaries for activations.
 
